@@ -1,14 +1,23 @@
+import Image from "next/image";
 import Measure from "@/components/Measure";
 import NaverMap from "@/components/NaverMap";
 import CardRail from "@/components/CardRail";
 import HeroReveal from "@/components/HeroReveal";
 import Placeholder from "@/components/Placeholder";
+import ImplantAnatomy from "@/components/diagrams/ImplantAnatomy";
+import OrthoCompare from "@/components/diagrams/OrthoCompare";
+import type { CarouselCard } from "@/components/CardCarousel";
 import {
   clinic,
   doctor,
   faqs,
   hours,
+  implantIntro,
+  implantMethods,
+  implantProcess,
   implants,
+  orthoCautions,
+  orthoIntro,
   orthodontics,
   principles,
   tour,
@@ -28,10 +37,6 @@ export default function Home() {
       {/* 진료 원칙 — 여섯 가지를 한눈에 펼쳐 둡니다. */}
       <section id="principles" className="mx-auto max-w-6xl px-6 py-14 sm:py-20">
         <h2 className="heading text-center text-2xl sm:text-3xl">진료 원칙</h2>
-        <p className="prose-ko mx-auto mt-4 max-w-xl text-center text-sm text-muted">
-          빼도 되는 치아를 남기는 일부터 치료가 끝난 뒤의 관리까지, 판단이 갈리는
-          자리마다 무엇을 기준으로 삼는지 적었습니다.
-        </p>
 
         {/* auto-rows-fr 이 두 줄의 높이를 같게 맞춰 여섯 장이 모두 같은 크기가 됩니다. */}
         <div className="mt-10 grid auto-rows-fr gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -56,23 +61,19 @@ export default function Home() {
         화살표로도 그대로 넘길 수 있고, 두 쪽이 같은 번호를 봅니다.
       */}
       <CardRail
+        id="implant"
         title="임플란트"
         lead="임플란트는 심는 것보다 심을 자리를 만드는 일이 어렵습니다. 뼈가 부족한지, 얼마나 오래 비어 있었는지, 상악동과 신경관이 어디에 있는지에 따라 방법이 달라집니다."
-        items={implants}
-        label="임플란트 방법"
+        items={implantCards}
+        label="임플란트 안내"
       />
 
       <CardRail
+        id="ortho"
         title="치아교정"
         lead="장치가 보이는 것이 부담스러운지, 빼고 끼울 수 있어야 하는지에 따라 선택이 갈립니다. 치아 상태와 생활을 함께 보고 고릅니다."
-        items={orthodontics.map((o) => ({
-          title: o.title,
-          // 한 줄 요약은 카드에서 제목 옆에 붙습니다.
-          lead: o.summary,
-          points: o.points,
-          image: o.image,
-        }))}
-        label="교정 장치"
+        items={orthoCards}
+        label="치아교정 안내"
       />
 
       <CardRail
@@ -110,13 +111,18 @@ export default function Home() {
             </div>
 
             <div className="grid gap-x-12 sm:grid-cols-2">
-              <Credentials heading="학력" items={[...doctor.education]} />
+              <Credentials
+                heading="학력"
+                items={[...doctor.education]}
+                badge={{ src: "/logo/snu-mark.png", width: 274, height: 284 }}
+              />
               <Credentials heading="경력" items={[...doctor.career]} />
               <div className="sm:col-span-2">
                 <Credentials
                   heading="학회 · 연구회"
                   items={[...doctor.societies]}
                   columns
+                  badge={{ src: "/logo/aaid-mark.png", width: 350, height: 248 }}
                 />
               </div>
             </div>
@@ -219,6 +225,114 @@ export default function Home() {
 }
 
 /*
+ * 임플란트 카드 목록 — 상위 세 장("무엇인가" · "어떻게 진행되는가" ·
+ * "어느 쪽인가") 밑에 다섯 가지 방법이 하위 항목(`sub`)으로 붙습니다.
+ * 상위 세 장은 사진 한 장으로 대신할 수 없어 `node` 로 짜임을 직접 넣습니다.
+ */
+const implantCards: readonly CarouselCard[] = [
+  {
+    title: "임플란트란",
+    lead: implantIntro.lead,
+    body: implantIntro.body,
+    node: <ImplantAnatomy className="mx-auto w-full max-w-sm" />,
+  },
+  {
+    title: "치료 과정",
+    lead: "뼈이식이 필요 없는 경우 기준",
+    node: <ImplantProcess />,
+  },
+  {
+    title: "치료 방법",
+    lead: implantMethods.lead,
+    body: implantMethods.body,
+    node: <ImplantMethods />,
+  },
+  ...implants.map((item) => ({ ...item, sub: true })),
+];
+
+/*
+ * 다섯 가지를 이름과 "언제 쓰는가" 한 줄로만 훑어 줍니다. 자세한 내용은
+ * 바로 뒤따르는 카드 다섯 장이 각각 맡으므로 여기서 되풀이하지 않습니다.
+ */
+function ImplantMethods() {
+  return (
+    <ul>
+      {implants.map((m) => (
+        <li
+          key={m.title}
+          className="grid gap-x-4 border-t border-rule py-2.5 first:border-t-0 first:pt-0 sm:grid-cols-[11rem_1fr] sm:items-baseline"
+        >
+          <h4 className="text-sm font-bold">{m.title}</h4>
+          <p className="mt-0.5 text-sm leading-[1.6] text-muted sm:mt-0">
+            {m.lead}
+          </p>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/*
+ * 교정 카드 목록 — "교정 방식"이 맨 위, "주의사항"이 맨 아래이고 그 사이에
+ * 장치 두 가지가 들어갑니다. 장치 둘은 `sub` 로 표시해, 왼쪽 목록에서
+ * "교정 방식" 아래 한 단 들어간 하위 항목으로 보이게 했습니다.
+ */
+const orthoCards: readonly CarouselCard[] = [
+  {
+    title: "교정 방식",
+    lead: orthoIntro.lead,
+    body: orthoIntro.body,
+    node: <OrthoCompare className="mx-auto w-full max-w-sm" />,
+  },
+  ...orthodontics.map((o) => ({
+    title: o.title,
+    // 한 줄 요약은 카드에서 제목 옆에 붙습니다.
+    lead: o.summary,
+    points: o.points,
+    image: o.image,
+    sub: true,
+  })),
+  {
+    title: "주의사항",
+    lead: orthoCautions.lead,
+    points: orthoCautions.points,
+    plain: true,
+  },
+];
+
+/*
+ * 다섯 단계를 카드 한 장 안에 세웁니다. 상세 설명 대신 한 줄 요약(`short`)만
+ * 싣고 단계 사이 간격을 괘선 하나 두께까지 좁혀야 다섯 줄이 모두 들어옵니다.
+ */
+function ImplantProcess() {
+  return (
+    <ol>
+      {implantProcess.map((s, i) => (
+        <li
+          key={s.step}
+          className="grid grid-cols-[1.5rem_1fr] gap-x-2 border-t border-rule py-2.5 first:border-t-0 first:pt-0 sm:grid-cols-[1.5rem_11rem_1fr] sm:gap-x-4 sm:items-baseline"
+        >
+          <span aria-hidden className="text-xs tabular-nums text-blue">
+            {String(i + 1).padStart(2, "0")}
+          </span>
+          <div className="sm:contents">
+            <h4 className="text-sm font-bold">
+              {s.step}
+              <span className="ml-2 text-xs font-normal text-faint sm:ml-0 sm:block sm:mt-0.5">
+                {s.duration}
+              </span>
+            </h4>
+            <p className="mt-1 text-sm leading-[1.6] text-muted sm:mt-0">
+              {s.short}
+            </p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+/*
  * 질문 하나. `<details>` 를 그대로 씁니다.
  * 직접 만들면 열고 닫는 상태, 키보드, 보조기기 알림을 전부 손으로 붙여야 하는데
  * 브라우저가 이미 다 해 줍니다. +/- 표시는 `group-open` 으로 바꿉니다.
@@ -242,27 +356,83 @@ function Faq({ question, answer }: { question: string; answer: string }) {
   );
 }
 
+/**
+ * 약력 한 덩이. `badge` 를 넘기면 **왼쪽 칸의 오른쪽 끝**에 로고가 섭니다.
+ *
+ * 학력은 칸 하나를 통째로 쓰고, 학회 · 연구회는 여섯 줄을 두 칸으로 나눠
+ * 그중 왼쪽 칸에 로고를 답니다. 바깥 약력 그리드와 학회 목록이 같은 폭
+ * (`gap-x-12` 로 반씩)을 쓰므로, 두 로고의 좌우 자리가 저절로 맞습니다.
+ *
+ * 여섯 줄을 CSS 다단(`columns-2`)이 아니라 두 목록으로 나눈 이유도 이것입니다.
+ * 다단은 칸의 경계가 요소가 아니라서 그 자리에 로고를 세울 수 없습니다.
+ * 줄 수가 짝수든 홀수든 앞쪽 칸이 한 줄 더 가져가므로 보이는 결과는 같습니다.
+ */
 function Credentials({
   heading,
   items,
   columns = false,
+  badge,
 }: {
   heading: string;
   items: string[];
   columns?: boolean;
+  badge?: Badge;
 }) {
+  const half = Math.ceil(items.length / 2);
   return (
     <div className="border-t border-rule py-4">
       <h3 className="text-sm text-muted">{heading}</h3>
-      <ul
-        className={`mt-2 space-y-1 text-base ${columns ? "sm:columns-2 sm:gap-12" : ""}`}
-      >
+      {columns ? (
+        <div className="mt-2 grid gap-x-12 sm:grid-cols-2">
+          <CredentialList items={items.slice(0, half)} badge={badge} />
+          <CredentialList items={items.slice(half)} />
+        </div>
+      ) : (
+        <CredentialList className="mt-2" items={items} badge={badge} />
+      )}
+    </div>
+  );
+}
+
+type Badge = { src: string; width: number; height: number };
+
+function CredentialList({
+  items,
+  badge,
+  className = "",
+}: {
+  items: string[];
+  badge?: Badge;
+  className?: string;
+}) {
+  return (
+    <div className={`flex items-start gap-6 ${className}`}>
+      <ul className="min-w-0 flex-1 space-y-1 text-base">
         {items.map((item) => (
-          <li key={item} className="break-inside-avoid">
-            {item}
-          </li>
+          <li key={item}>{item}</li>
         ))}
       </ul>
+      {/*
+        로고 칸은 두 곳이 똑같습니다(112 × 80). 높이는 글 세 줄에 맞춘 값입니다
+        — 24px 짜리 줄 셋에 줄 사이 4px 둘을 더해 80px.
+
+        쓰는 그림은 원본이 아니라 **흰 여백을 잘라 낸 것**(`*-mark.png`)입니다.
+        원본은 둘 다 표장 둘레에 흰 바탕을 넉넉히 두르고 있어(AAID 는 회색
+        테두리까지), 같은 칸에 넣어도 실제로 보이는 표장 크기가 서로 달라집니다.
+        여백을 걷어 내야 `object-contain` 으로 둘 다 80px 높이로 서서 크기가
+        맞습니다. 헤더가 쓰는 `snu.png` 는 그대로 두었습니다.
+
+        글이 바로 옆에서 학교와 학회 이름을 읽어 주므로 alt 는 비웁니다.
+      */}
+      {badge && (
+        <Image
+          src={badge.src}
+          alt=""
+          width={badge.width}
+          height={badge.height}
+          className="h-20 w-28 shrink-0 object-contain"
+        />
+      )}
     </div>
   );
 }

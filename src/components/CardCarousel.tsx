@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 
 /**
  * 가로로 넘기는 카드 목록.
@@ -37,6 +37,23 @@ export type CarouselCard = {
    * `width`/`height` 는 `ownRatio` 일 때 카드 비율을 정하는 데 씁니다.
    */
   image?: { src: string; alt: string; width?: number; height?: number };
+  /**
+   * 그림이 앞으로도 들어올 일이 없는 글만 있는 카드면 `true`. 아래쪽 그림
+   * 자리를 아예 두지 않습니다. 시술 카드는 그림이 아직 없더라도 이 칸을
+   * 비워 둬야 넘길 때 그림 높이가 흔들리지 않으므로 붙이지 마세요.
+   */
+  plain?: boolean;
+  /**
+   * 왼쪽 목록에서 한 단 들여쓸 하위 항목이면 `true`. 카드 자체는 달라지지
+   * 않고 목록에서의 자리만 바뀝니다("교정 방식" 밑의 클리피씨·투명 교정).
+   */
+  sub?: boolean;
+  /**
+   * 사진 한 장으로 대신할 수 없는 카드에만 씁니다. 구조도(SVG)나 단계 목록처럼
+   * 짜임이 있는 내용이 여기 들어갑니다. `node` 가 있으면 아래쪽 그림 칸 대신
+   * 이 내용이 글 바로 밑에 놓이고, 높이는 내용이 정합니다.
+   */
+  node?: ReactNode;
 };
 
 export default function CardCarousel({
@@ -132,7 +149,13 @@ export default function CardCarousel({
   }, [index, go]);
 
   return (
-    <div>
+    /*
+     * `min-w-0` 이 없으면 이 덩이가 바깥 칸(그리드 한 칸)보다 넓어집니다.
+     * 그리드 칸 안의 항목은 기본값이 `min-width: auto` 라서 안쪽 카드들의
+     * 최소 너비를 전부 더한 만큼 벌어지고, 그 결과 좁은 화면에서 화면 전체가
+     * 가로로 밀려 나갑니다. 카드 수가 늘수록 심해집니다.
+     */
+    <div className="min-w-0">
       <div className="flex items-center gap-4 sm:gap-6">
         {/* 좁은 화면에서는 카드가 너무 좁아지므로 좌우 화살표를 감춥니다. */}
         <Arrow
@@ -151,7 +174,7 @@ export default function CardCarousel({
           }`}
         >
           {items.map((item) => {
-            const withText = Boolean(item.body || item.points);
+            const withText = Boolean(item.body || item.points || item.node);
             const pad =
               ownRatio && item.image?.width && item.image?.height
                 ? (item.image.height / item.image.width) * 100
@@ -170,8 +193,16 @@ export default function CardCarousel({
                 />
 
                 {withText ? (
-                  <div className="flex flex-col">
-                    <div className="px-7 pb-4 pt-6">
+                  /*
+                   * 카드 속은 기본이 가운데 정렬입니다(`.card-shell`). 글이
+                   * 짧아도 그림 칸이 아래를 받치고 있어 대개 티가 나지 않지만,
+                   * 그림 칸이 없는 `plain` 카드는 글 한 덩이가 카드 한가운데
+                   * 떠 보입니다. 그 카드만 위로 붙여 다른 카드와 줄을 맞춥니다.
+                   */
+                  <div
+                    className={`flex flex-col ${item.plain ? "self-start" : ""}`}
+                  >
+                    <div className={`px-7 pt-6 ${item.node ? "pb-7" : "pb-4"}`}>
                       {/* 시술명과 부가 설명을 한 줄에. 좁으면 아래로 접힙니다. */}
                       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                         <h3 className="heading text-xl">{item.title}</h3>
@@ -200,6 +231,12 @@ export default function CardCarousel({
                           ))}
                         </ul>
                       )}
+
+                      {/*
+                        구조도나 단계 목록처럼 짜임이 있는 내용. 그림 칸과 달리
+                        높이를 미리 잡지 않고 내용이 정하게 둡니다.
+                      */}
+                      {item.node && <div className="mt-5">{item.node}</div>}
                     </div>
 
                     {/*
@@ -207,18 +244,21 @@ export default function CardCarousel({
                       비워 두어야 카드끼리 짜임이 어긋나지 않습니다.
                       도해는 잘리면 뜻이 달라지므로 `object-contain` 으로
                       통째로 보여 줍니다. 글과 그림 사이에 괘선은 두지 않습니다.
+                      `node` 로 다른 내용을 채웠거나 `plain` 인 카드는 뺍니다.
                     */}
-                    <div className="relative mt-auto h-44 sm:h-56">
-                      {item.image && (
-                        <Image
-                          src={item.image.src}
-                          alt={item.image.alt}
-                          fill
-                          sizes="(min-width: 640px) 40rem, 100vw"
-                          className="object-contain p-3"
-                        />
-                      )}
-                    </div>
+                    {!item.node && !item.plain && (
+                      <div className="relative mt-auto h-44 sm:h-56">
+                        {item.image && (
+                          <Image
+                            src={item.image.src}
+                            alt={item.image.alt}
+                            fill
+                            sizes="(min-width: 640px) 40rem, 100vw"
+                            className="object-contain p-3"
+                          />
+                        )}
+                      </div>
+                    )}
                   </div>
                 ) : (
                   item.image && (

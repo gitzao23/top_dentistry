@@ -2,6 +2,7 @@
  * 임플란트 구조도 — 직접 그린 원본 도해입니다(외부 이미지 사용 안 함).
  * 잇몸·치조골은 회색 계열로 두고 인공 구조물만 파란색으로 구분해,
  * "무엇이 원래 있던 것이고 무엇이 새로 들어가는 것인지"가 한눈에 보이게 했습니다.
+ * 설명은 같은 카드의 글이 맡으므로 도해 자체에는 따로 붙이지 않습니다.
  */
 export default function ImplantAnatomy({ className = "" }: { className?: string }) {
   return (
@@ -111,13 +112,6 @@ export default function ImplantAnatomy({ className = "" }: { className?: string 
           </text>
         </g>
       </svg>
-
-      <figcaption className="prose-ko mt-6 text-sm text-muted">
-        임플란트는 세 부분으로 나뉩니다. 치조골에 심은 인공치근이 뼈와 직접
-        붙는 데 아래턱 2~3개월, 위턱 4~6개월이 걸리고, 그 뒤에 지대주와 보철을
-        얹습니다. 치료가 어려워지는 쪽은 대부분 보철이 아니라 인공치근이 들어갈
-        뼈의 상태입니다.
-      </figcaption>
     </figure>
   );
 }
