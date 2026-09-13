@@ -26,8 +26,11 @@ export const clinic = {
   mapUrl:
     "https://map.naver.com/p/search/" +
     encodeURIComponent("경기도 광주시 이배재로 123 탑치과"),
-  // TODO: 실제 도메인이 정해지면 교체하세요. 공유 미리보기와 sitemap 에 쓰입니다.
-  siteUrl: "https://topdental.kr",
+  /*
+   * 배포 주소. sitemap·robots·공유 미리보기(OG)의 절대 주소가 여기서 나옵니다.
+   * 병원 자체 도메인을 붙이면 이 값부터 바꾸고 다시 배포하세요.
+   */
+  siteUrl: "https://top-dentistry.vercel.app",
 } as const;
 
 export const transit = {
