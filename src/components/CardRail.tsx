@@ -31,21 +31,23 @@ export default function CardRail({
 
   return (
     <section id={id} className="border-t border-rule">
-      <div className="mx-auto grid max-w-6xl gap-8 px-6 py-14 sm:py-20 lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-14">
+      <div className="mx-auto grid max-w-6xl gap-5 px-6 py-10 sm:gap-8 sm:py-20 lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-14">
         {/*
           카드 레일이 그림자 자리로 위에 여백(py-5)을 두므로, 제목을 칸 맨 위에
           붙이면 카드보다 한참 높이 떠 보입니다. 그만큼 내려 맞춥니다.
         */}
         <div className="lg:pt-5">
           <h2 className="heading text-2xl sm:text-3xl">{title}</h2>
-          <p className="prose-ko mt-4 text-sm text-muted">{lead}</p>
+          <p className="mt-3 text-sm leading-[1.7] text-muted sm:mt-4 sm:leading-[1.9]">
+            {lead}
+          </p>
 
           {/*
             항목이 여덟 개까지 늘어나 줄 높이를 48px 에서 40px 로 조였습니다.
             손가락 표적 권장치(44px)보다 작으므로, 따로 만들 폰 화면에서는
             이 높이를 그대로 쓰지 말고 다시 키우세요.
           */}
-          <ul className="mt-5 border-t border-rule">
+          <ul className="mt-4 border-t border-rule sm:mt-5">
             {items.map((item, i) => {
               const on = i === index;
               /*

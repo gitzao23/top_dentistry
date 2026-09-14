@@ -2,6 +2,7 @@ import Image from "next/image";
 import Measure from "@/components/Measure";
 import NaverMap from "@/components/NaverMap";
 import CardRail from "@/components/CardRail";
+import PrincipleRail from "@/components/PrincipleRail";
 import HeroReveal from "@/components/HeroReveal";
 import Placeholder from "@/components/Placeholder";
 import ImplantAnatomy from "@/components/diagrams/ImplantAnatomy";
@@ -19,7 +20,6 @@ import {
   orthoCautions,
   orthoIntro,
   orthodontics,
-  principles,
   tour,
   transit,
 } from "@/content/clinic";
@@ -34,25 +34,13 @@ export default function Home() {
         <Measure />
       </div>
 
-      {/* 진료 원칙 — 여섯 가지를 한눈에 펼쳐 둡니다. */}
-      <section id="principles" className="mx-auto max-w-6xl px-6 py-14 sm:py-20">
+      {/*
+        진료 원칙 — 넓은 화면은 여섯 장을 한눈에 펼치고, 폰 화면에서는
+        임플란트·치아교정처럼 옆으로 넘겨 봅니다(PrincipleRail).
+      */}
+      <section id="principles" className="mx-auto max-w-6xl px-6 py-10 sm:py-20">
         <h2 className="heading text-center text-2xl sm:text-3xl">진료 원칙</h2>
-
-        {/* auto-rows-fr 이 두 줄의 높이를 같게 맞춰 여섯 장이 모두 같은 크기가 됩니다. */}
-        <div className="mt-10 grid auto-rows-fr gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {principles.map((p, i) => (
-            <article
-              key={p.title}
-              className="rounded-3xl bg-page p-7 shadow-[12px_12px_24px_-10px_rgba(22,32,43,0.28)]"
-            >
-              <p className="text-xs tracking-[0.14em] text-faint">
-                원칙 {String(i + 1).padStart(2, "0")}
-              </p>
-              <h3 className="heading mt-3 text-[1.0625rem]">{p.title}</h3>
-              <p className="prose-ko mt-3 text-sm text-muted">{p.body}</p>
-            </article>
-          ))}
-        </div>
+        <PrincipleRail />
       </section>
 
       {/*
@@ -132,10 +120,10 @@ export default function Home() {
 
       {/* 자주 묻는 질문 — 질문마다 +/- 로 열고 닫습니다. */}
       <section id="faq" className="border-t border-rule bg-surface">
-        <div className="mx-auto grid max-w-6xl gap-10 px-6 py-14 sm:py-20 lg:grid-cols-[20rem_1fr] lg:gap-20">
+        <div className="mx-auto grid max-w-6xl gap-6 px-6 py-10 sm:gap-10 sm:py-20 lg:grid-cols-[20rem_1fr] lg:gap-20">
           <div>
             <h2 className="heading text-2xl sm:text-3xl">자주 묻는 질문</h2>
-            <p className="prose-ko mt-5 text-sm text-muted">
+            <p className="mt-3 text-sm leading-[1.7] text-muted sm:mt-5 sm:leading-[1.9]">
               진료 전에 가장 많이 받는 질문입니다. 여기에 없는 것은 전화로
               물어보셔도 됩니다.
             </p>
@@ -260,10 +248,10 @@ function ImplantMethods() {
       {implants.map((m) => (
         <li
           key={m.title}
-          className="grid gap-x-4 border-t border-rule py-2.5 first:border-t-0 first:pt-0 sm:grid-cols-[11rem_1fr] sm:items-baseline"
+          className="grid gap-x-4 border-t border-rule py-1.5 first:border-t-0 first:pt-0 sm:py-2.5 sm:grid-cols-[11rem_1fr] sm:items-baseline"
         >
-          <h4 className="text-sm font-bold">{m.title}</h4>
-          <p className="mt-0.5 text-sm leading-[1.6] text-muted sm:mt-0">
+          <h4 className="text-[0.8125rem] font-bold sm:text-sm">{m.title}</h4>
+          <p className="text-[0.8125rem] leading-[1.5] text-muted sm:mt-0 sm:text-sm sm:leading-[1.6]">
             {m.lead}
           </p>
         </li>
@@ -310,19 +298,19 @@ function ImplantProcess() {
       {implantProcess.map((s, i) => (
         <li
           key={s.step}
-          className="grid grid-cols-[1.5rem_1fr] gap-x-2 border-t border-rule py-2.5 first:border-t-0 first:pt-0 sm:grid-cols-[1.5rem_11rem_1fr] sm:gap-x-4 sm:items-baseline"
+          className="grid grid-cols-[1.5rem_1fr] gap-x-2 border-t border-rule py-1.5 first:border-t-0 first:pt-0 sm:py-2.5 sm:grid-cols-[1.5rem_11rem_1fr] sm:gap-x-4 sm:items-baseline"
         >
           <span aria-hidden className="text-xs tabular-nums text-blue">
             {String(i + 1).padStart(2, "0")}
           </span>
           <div className="sm:contents">
-            <h4 className="text-sm font-bold">
+            <h4 className="text-[0.8125rem] font-bold sm:text-sm">
               {s.step}
               <span className="ml-2 text-xs font-normal text-faint sm:ml-0 sm:block sm:mt-0.5">
                 {s.duration}
               </span>
             </h4>
-            <p className="mt-1 text-sm leading-[1.6] text-muted sm:mt-0">
+            <p className="text-[0.8125rem] leading-[1.5] text-muted sm:mt-0 sm:text-sm sm:leading-[1.6]">
               {s.short}
             </p>
           </div>
@@ -340,18 +328,20 @@ function ImplantProcess() {
 function Faq({ question, answer }: { question: string; answer: string }) {
   return (
     <details className="group border-b border-rule">
-      <summary className="flex cursor-pointer list-none items-start gap-4 py-5 marker:content-none">
+      <summary className="flex cursor-pointer list-none items-start gap-3 py-2.5 marker:content-none sm:gap-4 sm:py-5">
         <span
           aria-hidden
-          className="relative mt-1.5 block size-4 shrink-0 text-blue"
+          className="relative mt-1 block size-4 shrink-0 text-blue sm:mt-1.5"
         >
           {/* 가로선은 늘 있고, 세로선만 열릴 때 사라집니다. */}
           <span className="absolute left-0 top-1/2 h-px w-4 -translate-y-1/2 bg-current" />
           <span className="absolute left-1/2 top-0 h-4 w-px -translate-x-1/2 bg-current transition-transform group-open:scale-y-0" />
         </span>
-        <span className="text-[1.0625rem] font-medium">{question}</span>
+        <span className="text-sm font-medium sm:text-[1.0625rem]">{question}</span>
       </summary>
-      <p className="prose-ko pb-6 pl-8 text-sm text-muted">{answer}</p>
+      <p className="pb-4 pl-7 text-[0.8125rem] leading-[1.7] text-muted sm:pb-6 sm:pl-8 sm:text-sm sm:leading-[1.9]">
+        {answer}
+      </p>
     </details>
   );
 }
