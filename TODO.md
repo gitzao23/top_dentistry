@@ -43,7 +43,7 @@
 ## 재개하는 법
 
 ```bash
-cd "C:\Users\suhjo\Desktop\3. 개인 프로젝트\3. 홈페이지 만들기"
+cd "C:\Users\suhjo\Desktop\3. 개인 프로젝트\3. 홈페이지 만들기\1. 탑치과 홈페이지"
 npm run dev     # → http://localhost:3000
 ```
 
